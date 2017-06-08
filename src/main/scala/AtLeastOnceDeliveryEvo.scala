@@ -23,7 +23,7 @@ object AtLeastOnceDeliveryEvo extends App {
       case Clerk.Command.Item(itemId) =>
         persist(Clerk.Event.NewItem(itemId)) { event =>
           log.info(s"New item: $itemId")
-          deliver(buyer.path, deliveryId => Buyer.BuyRequest(deliveryId, itemId))
+          //deliver(buyer.path, deliveryId => Buyer.BuyRequest(deliveryId, itemId))
         }
       case Clerk.Command.BuyAck(deliveryId, itemId) =>
         persist(Clerk.Event.BuyAck(deliveryId, itemId)) { event =>
@@ -35,7 +35,7 @@ object AtLeastOnceDeliveryEvo extends App {
     }
 
     val receiveRecover: Receive = {
-      case Clerk.Event.NewItem(itemId) => deliver(buyer.path, deliveryId => Buyer.BuyRequest(deliveryId, itemId))
+      case Clerk.Event.NewItem(itemId) => //deliver(buyer.path, deliveryId => Buyer.BuyRequest(deliveryId, itemId))
       case Clerk.Event.BuyAck(deliveryId, itemId) => {
         updateState(itemId)
         confirmDelivery(deliveryId)
@@ -86,6 +86,5 @@ object AtLeastOnceDeliveryEvo extends App {
     case _ => println("Unknown input. Type 'q' to quit.")
   }
 
-  system.shutdown()
-  system.awaitTermination()
+  system.terminate()
 }
